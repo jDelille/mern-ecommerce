@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Row,
@@ -14,14 +14,15 @@ import Rating from "../components/Rating";
 import Message from "../components/Message";
 import Loader from "../components/Loader";
 import { ListProductDetails } from "../actions/productActions";
-import { useParams } from "react-router-dom";
-import { Container, FormGroup, FormControl } from "react-bootstrap";
-
+import { FormControl } from "react-bootstrap";
+import "../index.scss";
 const ProductScreen = ({ match }) => {
   const [qty, setQty] = useState(0);
   const { id } = useParams();
 
   const dispatch = useDispatch();
+  // useNavigate has replaced useHistory
+  let history = useNavigate()
 
   const productDetails = useSelector((state) => state.productDetails);
   const { loading, error, product } = productDetails;
@@ -29,6 +30,10 @@ const ProductScreen = ({ match }) => {
   useEffect(() => {
     dispatch(ListProductDetails(id));
   }, [dispatch, match, id]);
+
+  const addToCartHandler = () => {
+    history(`/cart/${id}?qty=${qty}`);
+  };
 
   return (
     <>
@@ -41,10 +46,15 @@ const ProductScreen = ({ match }) => {
         <Message variant="danger">{error}</Message>
       ) : (
         <Row>
-          <Col md={6}>
-            <Image src={product.image} alt={product.name} fluid></Image>
+          <Col md={4} className="test">
+            <Image
+              src={product.image}
+              alt={product.name}
+              fluid
+              className="product-img-large"
+            ></Image>
           </Col>
-          <Col md={3}>
+          <Col md={5}>
             <ListGroup variant="flush">
               <ListGroupItem>
                 <h3>{product.name}</h3>
@@ -56,7 +66,7 @@ const ProductScreen = ({ match }) => {
                 />
               </ListGroupItem>
               <ListGroupItem>Price: ${product.price}</ListGroupItem>
-              <ListGroupItem>Description: ${product.description}</ListGroupItem>
+              <ListGroupItem> {product.description}</ListGroupItem>
             </ListGroup>
           </Col>
           <Col md={3}>
@@ -90,7 +100,11 @@ const ProductScreen = ({ match }) => {
                           onChange={(e) => setQty(e.target.value)}
                         >
                           {[...Array(product.countInStock).keys()].map((x) => {
-                            return <option value={x+1} key={x+1}>{x+1}</option>;
+                            return (
+                              <option value={x + 1} key={x + 1}>
+                                {x + 1}
+                              </option>
+                            );
                           })}
                         </FormControl>
                       </Col>
@@ -100,6 +114,7 @@ const ProductScreen = ({ match }) => {
 
                 <ListGroupItem>
                   <Button
+                    onClick={addToCartHandler}
                     className="btn-block"
                     type="button"
                     disabled={product.countInStock === 0}
