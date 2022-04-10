@@ -8,9 +8,9 @@
 - Added different routes using React Router.
 - Added basic styling using Bootstrap and SCSS.
 - Added product detail page.
+- Implement Redux.
 
 ### To be completed:
-- Implement Redux.
 - Add login / signup.
 - Add shopping cart.
 - Add payment functionality.
